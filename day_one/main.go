@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	f, err := os.OpenFile("data.txt", os.O_RDONLY, os.ModePerm)
+	f, err := os.OpenFile("input.txt", os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		log.Fatalf("open file error: %v", err)
 		return
