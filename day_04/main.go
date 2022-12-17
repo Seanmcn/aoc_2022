@@ -19,30 +19,11 @@ type sectionAssignment struct {
 }
 
 func assigmentOverlapsCompletely(first sectionAssignment, second sectionAssignment) bool {
-	if first.start >= second.start && first.end <= second.end {
-		return true
-	}
-	if second.start >= first.start && second.end <= first.end {
-		return true
-	}
-	return false
+	return (first.start >= second.start && first.end <= second.end) || (second.start >= first.start && second.end <= first.end)
 }
 
 func assignmentOverlapsPartially(first sectionAssignment, second sectionAssignment) bool {
-
-	if first.end >= second.start && first.end <= second.end {
-		return true
-	}
-	if second.start >= first.start && second.end <= first.end {
-		return true
-	}
-	if second.end >= first.start && second.end <= first.end {
-		return true
-	}
-	if first.start >= second.start && first.end <= second.end {
-		return true
-	}
-	return false
+	return (first.start <= second.end && first.end >= second.start) || (second.start <= first.end && second.end >= first.start)
 }
 
 func main() {
