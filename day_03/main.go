@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -36,6 +37,39 @@ func getDuplicateItem(compartmentA string, compartmentB string) string {
 	return ""
 }
 
+func getSharedItem(groupStrings [3]string, allGroupItemCount map[string]int) string {
+	for _, s := range groupStrings {
+		// Map to ensure we aren't counting the same character twice
+		var groupItemCount = map[string]int{}
+
+		for _, c := range s {
+			if _, ok := groupItemCount[string(c)]; ok {
+				// Already have character, move on
+			} else {
+				groupItemCount[string(c)] = 1
+				allGroupItemCount[string(c)] += 1
+			}
+		}
+	}
+
+	// Make slice of keys to sort
+	keys := make([]string, 0, len(allGroupItemCount))
+	for k := range allGroupItemCount {
+		keys = append(keys, k)
+	}
+
+	// Sort by value
+	sort.Slice(keys, func(i, j int) bool { return allGroupItemCount[keys[i]] > allGroupItemCount[keys[j]] })
+
+	// Return the highest value
+	for _, k := range keys {
+		return k
+	}
+
+	// Failsafe
+	return ""
+}
+
 func main() {
 
 	f, err := file.Open("input.txt")
@@ -45,8 +79,11 @@ func main() {
 	}
 	sc := bufio.NewScanner(f)
 	itemPrioritySum := 0
+	groupItemPrioritySum := 0
 
 	c := 1
+	var groupStrings [3]string
+	var allGroupItemCount = map[string]int{}
 
 	for sc.Scan() {
 		line := sc.Text()
@@ -58,16 +95,25 @@ func main() {
 		itemPriority := getItemPriority(duplicateItem)
 		itemPrioritySum += itemPriority
 
-		if c%3 == 0 {
-			// new group
-		}
+		k := c - 1
+		groupStrings[k] = line
 
-		c++
+		if c%3 == 0 {
+			c = 1
+			sharedItem := getSharedItem(groupStrings, allGroupItemCount)
+			sharedItemPriority := getItemPriority(sharedItem)
+			groupItemPrioritySum += sharedItemPriority
+			// Reset Map
+			allGroupItemCount = map[string]int{}
+
+		} else {
+			c++
+		}
 
 	}
 
 	fmt.Printf("Part One: : %d\n", itemPrioritySum)
 
-	fmt.Printf("Part Two: : N/A")
+	fmt.Printf("Part Two: : %d \n", groupItemPrioritySum)
 
 }
