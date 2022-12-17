@@ -28,8 +28,25 @@ func assigmentOverlapsCompletely(first sectionAssignment, second sectionAssignme
 	return false
 }
 
+func assignmentOverlapsPartially(first sectionAssignment, second sectionAssignment) bool {
+
+	if first.end >= second.start && first.end <= second.end {
+		return true
+	}
+	if second.start >= first.start && second.end <= first.end {
+		return true
+	}
+	if second.end >= first.start && second.end <= first.end {
+		return true
+	}
+	if first.start >= second.start && first.end <= second.end {
+		return true
+	}
+	return false
+}
+
 func main() {
-	f, err := file.Open("example.txt")
+	f, err := file.Open("input.txt")
 	if err != nil {
 		log.Fatalf("open file error: %v", err)
 		return
@@ -40,6 +57,7 @@ func main() {
 	var re = regexp.MustCompile(`(?m)(\d.*)-(\d.*),(\d.*)-(\d.*)`)
 
 	assignmentsOverlappedCompletely := 0
+	assigmentOverlappedPartially := 0
 	for sc.Scan() {
 		line := sc.Text()
 		for _, match := range re.FindAllStringSubmatch(line, -1) {
@@ -56,8 +74,15 @@ func main() {
 				assignmentsOverlappedCompletely++
 			}
 
+			overlapsPartially := assignmentOverlapsPartially(firstAssignment, secondAssignment)
+
+			if overlapsPartially {
+				assigmentOverlappedPartially++
+			}
+
 		}
 	}
 
 	fmt.Printf("Answer Part One: %v\n", assignmentsOverlappedCompletely)
+	fmt.Printf("Answer Part Two: %v\n", assigmentOverlappedPartially)
 }
